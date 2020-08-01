@@ -1,30 +1,26 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import bodyParser from 'body-parser';
-import routes from './src/routes/crmRoutes';
+import express from "express";
+import { graphqlHTTP } from "express-graphql";
+
+import { schema } from "./src/data/schema";
 
 const app = express();
 const PORT = 3000;
 
-// mongoose connection
-mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/CRMdb', {
-    useMongoClient: true
-});
-
-// bodyparser setup
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-routes(app);
-
 // serving static files
-app.use(express.static('public'));
+app.use(express.static("public"));
 
-app.get('/', (req, res) =>
-    res.send(`Node and express server is running on port ${PORT}`)
+app.get("/", (req, res) =>
+  res.send(`Node and express server with graphql is running on port ${PORT}`)
+);
+
+app.use(
+  "/graphql",
+  graphqlHTTP({
+    schema: schema,
+    graphiql: true,
+  })
 );
 
 app.listen(PORT, () =>
-    console.log(`your server is running on port ${PORT}`)
+  console.log(`your server is running on  http://localhost:${PORT}/graphql`)
 );
